@@ -15,14 +15,8 @@ class LinkedIN_API_Controller {
 	private $_access_token;
 	private $_is_authorized = false;
 
-	function __construct() {
+	function __construct( array $settings ) {
 		$https = ( isset( $_SERVER['HTTPS'] ) && "on" == $_SERVER['HTTPS'] ) ? "https://" : "http://";
-		$settings = array(
-		    'api_key' => get_option( 'liac-api_key' ),
-		    'api_secret' => get_option( 'liac-api_secret' ),
-		    'scope' => get_option( 'liac-api_scope' ),
-		    'redirect_uri' => get_option( 'liac-api_redirect' )
-		);
 
 		$this->_domain = "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 		$this->_api_key = $settings['api_key'];

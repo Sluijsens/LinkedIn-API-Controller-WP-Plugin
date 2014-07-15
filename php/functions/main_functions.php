@@ -1,5 +1,43 @@
 <?php
 
+/**
+ * Get the email template for the application email
+ * @return string
+ */
+function liac_get_email_template() {
+	
+	$filename = "liac-email-template.php";
+	
+	if( file_exists( TEMPLATEPATH . "/$filename" ) ) {
+		$filename = TEMPLATEPATH . "/$filename";
+	} else {
+		$filename = LIAC_ROOT . "/templates/$filename";
+	}
+	return $filename;
+}
+
+/**
+ * Get the LinkedIn API Controller object
+ * @return \LinkedIN_API_Controller
+ */
+function get_api_controller() {
+
+	$settings = array(
+	    'api_key' => get_option( 'liac-api_key' ),
+	    'api_secret' => get_option( 'liac-api_secret' ),
+	    'scope' => get_option( 'liac-api_scope' ),
+	    'redirect_uri' => get_option( 'liac-api_redirect' )
+	);
+
+	return new LinkedIN_API_Controller( $settings );
+
+}
+
+/**
+ * Shortcode function to authorize the plugin at LinkedIn
+ * @param array $atts Attributes of the shortcode
+ * @return mixed Most likely to return a string. The code or text to show.
+ */
 function liac_authorize( $atts ) {
 	$atts = shortcode_atts( array(
 	    'redirect' => false,
@@ -12,14 +50,14 @@ function liac_authorize( $atts ) {
 	}
 
 	ob_start();
-	$linkedin_api = new LinkedIN_API_Controller();
+	$linkedin_api = get_api_controller();
 	if ( ! $linkedin_api->hasAccessToken() ) {
 		?>
 		<button onclick="location.href = '<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'"><?php _e( "Authorize", "liac" ); ?></button>
 		<?php
 	} else {
 		?>
-		<button onclick="window.open( '<?php echo home_url( '?show_pdf' ); ?>' )"><?php _e( "View PDF", "liac" ); ?></button>
+		<button class="liac-apply-button" onclick="window.open( '<?php echo home_url( '?show_pdf' ); ?>' )"><?php _e( "View PDF", "liac" ); ?></button>
 		<?php
 	}
 	$html = ob_get_contents();
@@ -31,43 +69,51 @@ function liac_authorize( $atts ) {
 
 add_shortcode( 'linkedin-authorization', 'liac_authorize' );
 
+/**
+ * Sends an email with a resume.
+ * @param object $linkedin_data An PHP Object with the linkedin data
+ */
 function send_resume_mail( $linkedin_data ) {
 
-// email stuff (change data below)
-	$to = "bdslop@gmail.com";
-	$from = "me@example.com";
-	$subject = "send email with pdf attachment";
-	$message = "<p>Please see the attachment.</p>";
-
-// a random hash will be necessary to send mixed content
+	// email stuff (change data below)
+	$to = get_option( 'liac-api_email' );
+	$from = $linkedin_data->emailAddress;
+	$subject = __( "Application from {$linkedin_data->firstName} {$linkedin_data->lastName} at " . get_bloginfo( 'name' ), "liac" );
+	
+	ob_start();
+	include_once( liac_get_email_template() );
+	$message = ob_get_contents();
+	ob_end_clean();
+	
+	// a random hash will be necessary to send mixed content
 	$separator = md5( time() );
 
-// carriage return type (we use a PHP end of line constant)
+	// carriage return type (we use a PHP end of line constant)
 	$eol = PHP_EOL;
 
 	$filename = "test.pdf";
-// encode data (puts attachment in proper format)
+	// encode data (puts attachment in proper format)
 	$pdfdoc = writePDF( $linkedin_data, true );
 	$attachment = chunk_split( base64_encode( $pdfdoc ) );
 
-// main header
+	// main header
 	$headers = "From: " . $from . $eol;
 	$headers .= "MIME-Version: 1.0" . $eol;
 	$headers .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"";
 
-// no more headers after this, we start the body! //
+	// no more headers after this, we start the body! //
 
 	$body = "--" . $separator . $eol;
 	$body .= "Content-Transfer-Encoding: 7bit" . $eol . $eol;
 	$body .= "This is a MIME encoded message." . $eol;
 
-// message
+	// message
 	$body .= "--" . $separator . $eol;
 	$body .= "Content-Type: text/html; charset=\"iso-8859-1\"" . $eol;
 	$body .= "Content-Transfer-Encoding: 8bit" . $eol . $eol;
 	$body .= $message . $eol;
 
-// attachment
+	// attachment
 	$body .= "--" . $separator . $eol;
 	$body .= "Content-Type: application/octet-stream; name=\"" . $filename . "\"" . $eol;
 	$body .= "Content-Transfer-Encoding: base64" . $eol;
@@ -75,7 +121,7 @@ function send_resume_mail( $linkedin_data ) {
 	$body .= $attachment . $eol;
 	$body .= "--" . $separator . "--";
 
-// send message
+	// send message
 	mail( $to, $subject, $body, $headers );
 
 }
@@ -90,7 +136,7 @@ function liac_before_headers() {
 	}
 
 	// Create an object
-	$linkedin_api = new LinkedIN_API_Controller();
+	$linkedin_api = get_api_controller();
 
 	// Check if user authorized LinkedIn. Then redirect to the page where he came from
 	if ( isset( $_SESSION['redirect_to'] ) && isset( $_GET['code'] ) && isset( $_SESSION['state'] ) && isset( $_GET['state'] ) ) {
@@ -131,13 +177,13 @@ function liac_before_headers() {
 
 
 	if ( $linkedin_api->hasAccessToken() && isset( $_GET['show_pdf'] ) ) {
-		
+
 		$resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,site-standard-profile-request,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
 		$result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
-		
+
 		send_resume_mail( $result );
 		writePDF( $result );
-		
+
 		exit;
 	} else if ( isset( $_GET['show_pdf'] ) ) {
 		$linkedin_api->getAuthorizationCode( true );
@@ -339,9 +385,9 @@ function writePDF( $linkedin_data, $return = false, $name = null ) {
 
 	$pdf->WriteHTML( "<br /><hr><br />" );
 	/* End Block Languages */
-	
-	if( $return ) {
-		return $pdf->Output("", "S");
+
+	if ( $return ) {
+		return $pdf->Output( "", "S" );
 	} else {
 		$pdf->Output();
 	}
