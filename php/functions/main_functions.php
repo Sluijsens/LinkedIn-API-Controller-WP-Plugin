@@ -180,7 +180,13 @@ function liac_before_headers() {
 
 		$resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
 		$result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
-
+		
+		$testarr = array(
+		    'test' => 'data',
+		    'tweede veld,' => 'ook data',
+		    'laatste dan' => 'je moeder'
+		);
+		
 		send_resume_mail( $result );
 		writePDF( $result );
 

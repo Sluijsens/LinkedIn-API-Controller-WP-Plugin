@@ -2,6 +2,9 @@
 
 class LIAC_Data {
 	
+	// ID
+	public $id;
+	
 	// Personal Info
 	public $picture_url;
 	public $first_name;
@@ -39,6 +42,7 @@ class LIAC_Data {
 	
 	public function __construct( $api_data ) {
 		
+		$this->id = $api_data->id;
 		$this->original_data = $api_data;
 		
 		if( ! empty( $api_data->picture_Url ) && "" != $api_data->pictureUrl )
