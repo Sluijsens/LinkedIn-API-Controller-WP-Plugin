@@ -163,7 +163,7 @@ class LinkedIN_API_Controller {
 			$response = file_get_contents( $url, false, $context );
 
 			// Native PHP object, please
-			return json_decode( $response );
+			return new LIAC_Data( json_decode( $response ) );
 		} else {
 
 			return false;

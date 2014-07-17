@@ -10,9 +10,10 @@
 
 define( "LIAC_ROOT", dirname( __FILE__ ) );
 
-require( 'php/lib/fpdf/fpdf.php' );
+include_once( 'php/lib/fpdf/fpdf.php' );
 require( 'php/classes/class-fpdf-html.php' );
 require( 'php/classes/class-linkedin-api-controller.php' );
+require( 'php/classes/class-liac-data.php' );
 
 include_once( 'php/classes/class-liac-admin.php' );
 include_once( 'php/functions/main_functions.php' );

@@ -34,7 +34,12 @@ class LIAC_Data {
 	public $publications;
 	public $last_modified;
 	
+	// Allow user to get the original/raw data
+	public $original_data;
+	
 	public function __construct( $api_data ) {
+		
+		$this->original_data = $api_data;
 		
 		if( ! empty( $api_data->picture_Url ) && "" != $api_data->pictureUrl )
 			$this->picture_url = $api_data->pictureUrl;
