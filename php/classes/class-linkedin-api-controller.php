@@ -34,9 +34,9 @@ class LinkedIN_API_Controller {
 	/**
 	 * Redirect to authorization login of LinkedIn. If redirect is set to false then return the link to the authorization page.
 	 * 
-	 * @param type $redirect If set to true, redirect user. If set to false, return link to authorization page.
+	 * @param type $redirect If set to true, redirect user. If set to false, return link to authorization page. A custom link also be given.
 	 * @param type $redirect_uri The redirect URI to use after authorization is completed. If not set, the default will be used.
-	 * @return mixed Link to authorization page or true if authorized.
+	 * @return String Link to authorization page.
 	 */
 	public function getAuthorizationCode( $redirect = TRUE ) {
 		//Set the parameters to get authorization code
@@ -52,6 +52,7 @@ class LinkedIN_API_Controller {
 		$https = ( ! empty( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ) ? "https://" : "http://";
 		// Set the page to redirect to the current page so you will be redirected to the same page after authorizing
 		$_SESSION['redirect_to'] = $https . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                $_SESSION['redirect_to'] = ( isset( $redirect ) && true != $redirect && false != $redirect ) ? $redirect : $_SESSION['redirect_to'];
 		// Save the 'state' to prevet CSRF attack.
 		$_SESSION['state'] = $params['state'];
 
@@ -60,7 +61,7 @@ class LinkedIN_API_Controller {
 
 		// Check if user needs to be redirected or needs the link
 		if ( TRUE == $redirect ) {
-			Header( "Location: $url" );
+			Header("Location: $url");
 			exit;
 		} else {
 			return $url;
@@ -96,7 +97,7 @@ class LinkedIN_API_Controller {
 			    'redirect_uri' => $this->_redirect_uri
 			);
 			$url = "https://www.linkedin.com/uas/oauth2/accessToken?" . http_build_query( $params );
-			//$url = "https://www.linkedin.com/uas/oauth2/accessToken?redirect_uri={$this->_redirect_uri}&" . http_build_query( $params );
+			
 			// Set stream context to method POST
 			$context = stream_context_create(
 				array(
@@ -165,8 +166,7 @@ class LinkedIN_API_Controller {
 			// Native PHP object, please
 			return new LIAC_Data( json_decode( $response ) );
 		} else {
-
-			return false;
+                        $this->getAuthorizationCode();
 		}
 
 	}

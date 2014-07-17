@@ -45,7 +45,7 @@ class LIAC_Data {
 		$this->id = $api_data->id;
 		$this->original_data = $api_data;
 		
-		if( ! empty( $api_data->picture_Url ) && "" != $api_data->pictureUrl )
+		if( ! empty( $api_data->pictureUrl ) && "" != $api_data->pictureUrl )
 			$this->picture_url = $api_data->pictureUrl;
 		if( ! empty( $api_data->firstName ) && "" != $api_data->firstName )
 			$this->first_name = $api_data->firstName;

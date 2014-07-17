@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: LinkedIn API Controller
- * Plugin URI: http://www.netwerven.nl
+ * Plugin URI: http://www.bryan-slop.nl
  * Description: A controller plugin to handle the linkedin api.
  * Version: 1.0
  * Author: Bryan Slop (Sluijsens)
