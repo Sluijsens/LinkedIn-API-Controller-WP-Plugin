@@ -57,7 +57,7 @@ function liac_authorize( $atts ) {
 		<?php
 	} else {
 		?>
-		<button class="liac-apply-button" onclick="window.open( '<?php echo home_url( '?show_pdf' ); ?>' )"><?php _e( "View PDF", "liac" ); ?></button>
+		<button class="liac-apply-button" onclick="window.open( '<?php echo home_url( '?liac_show_pdf' ); ?>' )"><?php _e( "View PDF", "liac" ); ?></button>
 		<?php
 	}
 	$html = ob_get_contents();
@@ -176,25 +176,18 @@ function liac_before_headers() {
 
 
 
-	if ( $linkedin_api->hasAccessToken() && isset( $_GET['show_pdf'] ) ) {
+	if ( $linkedin_api->hasAccessToken() && isset( $_GET['liac_show_pdf'] ) ) {
 
-		$resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,site-standard-profile-request,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
+		$resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
 		$result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
 
 		send_resume_mail( $result );
 		writePDF( $result );
 
 		exit;
-	} else if ( isset( $_GET['show_pdf'] ) ) {
+	} else if ( isset( $_GET['liac_show_pdf'] ) ) {
+		// Not authorized so redirect to authorize again before watching pdf
 		$linkedin_api->getAuthorizationCode( true );
-		?>
-		?>
-		<script type="text/javascript">
-			alert( "We are not authorized" );
-			window.close();
-		</script>
-		<?php
-		var_dump( "yutwhkjrh" );
 	}
 
 }
