@@ -38,7 +38,7 @@ class LinkedIN_API_Controller {
 	 * @param type $redirect_uri The redirect URI to use after authorization is completed. If not set, the default will be used.
 	 * @return String Link to authorization page.
 	 */
-	public function getAuthorizationCode( $redirect = TRUE ) {
+	public function getAuthorizationCode( $redirect = TRUE, $headers = TRUE ) {
 		//Set the parameters to get authorization code
 		$params = array(
 		    'response_type' => 'code',
@@ -61,8 +61,16 @@ class LinkedIN_API_Controller {
 
 		// Check if user needs to be redirected or needs the link
 		if ( TRUE == $redirect ) {
+                    if( $headers ) {
 			Header("Location: $url");
 			exit;
+                    } else {
+                        ?>
+                        <script type="text/javascript">
+                            location.href="<?php echo $url; ?>";
+                        </script>
+                        <?php
+                    }
 		} else {
 			return $url;
 		}
@@ -74,7 +82,7 @@ class LinkedIN_API_Controller {
 	 * 
 	 * @return mixed Return the access token. Returns false on failure.
 	 */
-	public function retrieveAccessToken( $set_cookie = true ) {
+	public function retrieveAccessToken( $set_cookie = TRUE ) {
 
 		if ( ! empty( $_COOKIE['linkedin_access_token'] ) ) {
 
@@ -116,8 +124,8 @@ class LinkedIN_API_Controller {
 
 				if( $set_cookie ) {
 					// Put the token in a cookie
-//					setcookie( "linkedin_access_token", $result->access_token, time() + $result->expires_in - ( 60 * 60 * 24 * 10 ), "/", $_SERVER['HTTP_HOST'] );
-					setcookie( "linkedin_access_token", $result->access_token, time() + 30, "/", $_SERVER['HTTP_HOST'] );
+					setcookie( "linkedin_access_token", $result->access_token, time() + $result->expires_in - ( 60 * 60 * 24 * 10 ), "/", $_SERVER['HTTP_HOST'] );
+//					setcookie( "linkedin_access_token", $result->access_token, time() + 30, "/", $_SERVER['HTTP_HOST'] );
 				}
 				$this->_access_token = $result->access_token;
 
@@ -166,7 +174,7 @@ class LinkedIN_API_Controller {
 			// Native PHP object, please
 			return new LIAC_Data( json_decode( $response ) );
 		} else {
-                        $this->getAuthorizationCode();
+                        $this->getAuthorizationCode( TRUE, FALSE );
 		}
 
 	}
@@ -200,7 +208,7 @@ class LinkedIN_API_Controller {
 	 * @return boolean
 	 */
 	public function hasAccessToken() {
-//		var_dump($_COOKIE);
+            
 		if ( ! empty( $this->_access_token ) && false != $this->_access_token ) {
 			return true;
 		} else {
@@ -209,7 +217,7 @@ class LinkedIN_API_Controller {
 
 	}
 	
-	public function getAccessTokenkj() {
+	public function getAccessToken() {
 		return $this->_access_token;
 	}
 	

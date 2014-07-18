@@ -1,5 +1,17 @@
 <?php
 
+
+function liac_get_default_data() {
+    
+    $linkedin_api = liac_get_api_controller();
+    
+    $resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
+    $result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
+    
+    return $result;
+    
+}
+
 /**
  * Get the email template for the application email
  * @return string
@@ -20,7 +32,7 @@ function liac_get_email_template() {
  * Get the LinkedIn API Controller object
  * @return \LinkedIN_API_Controller
  */
-function get_api_controller() {
+function liac_get_api_controller() {
 
     $settings = array(
 	'api_key' => get_option( 'liac-api_key' ),
@@ -49,7 +61,7 @@ function liac_authorize( $atts ) {
     }
 
     ob_start();
-    $linkedin_api = get_api_controller();
+    $linkedin_api = liac_get_api_controller();
     if ( !$linkedin_api->hasAccessToken() ) {
 	?>
 	<button onclick="location.href = '<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'"><?php _e( "Log in to LinkedIn", "liac" ); ?></button>
@@ -141,7 +153,7 @@ function liac_before_headers() {
     }
 
     // Create an object
-    $linkedin_api = get_api_controller();
+    $linkedin_api = liac_get_api_controller();
 
     // Check if user authorized LinkedIn. Then redirect to the page where he came from
     if ( isset( $_SESSION['redirect_to'] ) && isset( $_GET['code'] ) && isset( $_SESSION['state'] ) && isset( $_GET['state'] ) ) {
@@ -154,8 +166,8 @@ function liac_before_headers() {
 	    $resource = '/v1/people/~:(id)';
 	    $result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
 
-	    set_transient( $result->id, $access_token->access_token, time() + 30 );
-	    setcookie( "linkedin_access_token", $result->id, time() + 30, "/", $_SERVER['HTTP_HOST'] );
+	    set_transient( $result->id, $access_token->access_token, time() + $access_token->expires_in - ( 60 * 60 * 24 * 10 ) );
+	    setcookie( "linkedin_access_token", $result->access_token, time() + $access_token->expires_in - ( 60 * 60 * 24 * 10 ), "/", $_SERVER['HTTP_HOST'] );
 
 	    unset( $_SESSION['state'] );
 	    unset( $_GET['state'] );
