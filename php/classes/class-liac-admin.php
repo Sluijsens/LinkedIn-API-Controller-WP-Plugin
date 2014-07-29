@@ -78,7 +78,7 @@ class LIAC_Admin {
 							<td>
 								<input type="text" class="regular-text" name="api_redirect" id="api_redirect" value="<?php echo $api_redirect; ?>" />
 								<p class="description">
-									<?php _e( "Make sure you registered the given redirect uri at LinkedIn!", "liac" ); ?>
+									<?php echo sprintf(  __( "Make sure you registered the given redirect uri at LinkedIn! NOTE: When your site is a multisite and does NOT use subdomains then make sure to add the link to the homepage. For example, if you have a dutch site, this field should be something like %s/nl/ and NOT just %s!", "liac" ), $https.$_SERVER['HTTP_HOST'], $https.$_SERVER['HTTP_HOST']); ?>
 								</p>
 							</td>
 						</tr>

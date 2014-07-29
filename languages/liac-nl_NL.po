@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: LinkedIn API Controller 1.0\n"
-"POT-Creation-Date: 2014-07-15 14:37+0100\n"
-"PO-Revision-Date: 2014-07-15 14:44+0100\n"
+"POT-Creation-Date: 2014-07-29 11:03+0100\n"
+"PO-Revision-Date: 2014-07-29 11:05+0100\n"
 "Last-Translator: Bryan Slop <bdslop@gmail.com>\n"
 "Language-Team: Netwerven <bryan@netwerven.nl>\n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.6\n"
+"X-Generator: Poedit 1.6.7\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -43,8 +43,18 @@ msgid "Redirect URI"
 msgstr "Omleidings URI"
 
 #: ../php/classes/class-liac-admin.php:81
-msgid "Make sure you registered the given redirect uri at LinkedIn!"
-msgstr "Zorg dat je de omleidings URI hebt geregistreerd via LinkedIn!"
+#, php-format
+msgid ""
+"Make sure you registered the given redirect uri at LinkedIn! NOTE: When your "
+"site is a multisite and does NOT use subdomains then make sure to add the "
+"link to the homepage. For example, if you have a dutch site, this field "
+"should be something like %s/nl/ and NOT just %s!"
+msgstr ""
+"Zorg ervoor dat de Omleiding URI geregistreerd is bij LinkedIn! LET OP: "
+"Wanneer je site een multisite is en GEEN gebruik maakt van subdomeinen, zorg "
+"er dan voor dat de volledige link naar de homepagina is ingevuld. Als je "
+"bijvoorbeeld een nederlandse site hebt, dan moet dit veld iets zijn als %s/"
+"nl/ en NIET gewoon %s!"
 
 #: ../php/classes/class-liac-admin.php:86
 msgid "Languages"
@@ -63,14 +73,30 @@ msgstr ""
 "in één van de geselecteerde talen beschikbaar is wordt de primaire taal "
 "gekozen."
 
-#: ../php/functions/main_functions.php:56
-msgid "Authorize"
-msgstr "Authoriseren"
+#: ../php/functions/main_functions.php:67
+msgid "Log in to LinkedIn"
+msgstr "Log in bij LinkedIn"
 
-#: ../php/functions/main_functions.php:60
+#: ../php/functions/main_functions.php:71
 msgid "View PDF"
 msgstr "Bekijk PDF"
 
+#: ../php/functions/main_functions.php:211
+msgid "You successfully applied via linkedin!"
+msgstr "Je hebt succesvol gesolliciteerd via LinkedIn!"
+
+#: ../php/functions/main_functions.php:221
+msgid "Vacancy ID unknown (parameter 'vacancy_id' not set or not numeric)!"
+msgstr ""
+"Vacature ID niet bekend (parameter 'vacancy_id' bestaat niet of is geen "
+"getal)!"
+
 #: ../templates/liac-email-template.php:3
 msgid "Nice Email template. When you see this it works"
-msgstr ""
+msgstr "Mooi Email template. Wanneer je dit ziet werkt het."
+
+#~ msgid "Make sure you registered the given redirect uri at LinkedIn!"
+#~ msgstr "Zorg dat je de omleidings URI hebt geregistreerd via LinkedIn!"
+
+#~ msgid "Authorize"
+#~ msgstr "Authoriseren"
