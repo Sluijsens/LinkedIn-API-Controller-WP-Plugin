@@ -68,7 +68,7 @@ function liac_authorize( $atts ) {
 	<?php
     } else {
 
-	$content = "<button class='liac-apply-button' onclick=\"window.open( '" . home_url( '?liac_show_pdf' ) . "' )\">" . __( "View PDF", "liac" ) . "</button>";
+	$content = "<button class='liac-apply-button' onclick=\"window.open( '" . home_url( '?liac-show-pdf' ) . "' )\">" . __( "View PDF", "liac" ) . "</button>";
 	$content = apply_filters( "liac-authorized_content", $content );
 
 	echo $content;
