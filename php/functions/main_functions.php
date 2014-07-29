@@ -64,11 +64,11 @@ function liac_authorize( $atts ) {
     $linkedin_api = liac_get_api_controller();
     if ( !$linkedin_api->hasAccessToken() ) {
 	?>
-	<button onclick="location.href = '<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'"><?php _e( "Log in to LinkedIn", "liac" ); ?></button>
+<a class="liac-apply_linkedin_button" href='<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'><img height="33px" width="190px" src="<?php echo LIAC_ROOT_URI.'/style/images/ApplyLinkedIn.png'; ?>" /></a>
 	<?php
     } else {
 
-	$content = "<button class='liac-apply-button' onclick=\"window.open( '" . home_url( '?liac-show-pdf' ) . "' )\">" . __( "View PDF", "liac" ) . "</button>";
+	$content = "<a class='liac-apply_linkedin_button' href='" . home_url( '?liac-show-pdf' ) . "' target='_blank'></a>";
 	$content = apply_filters( "liac-authorized_content", $content );
 
 	echo $content;
