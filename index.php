@@ -26,7 +26,5 @@ $https = ( isset( $_SERVER['HTTPS'] ) && "on" == $_SERVER['HTTPS'] ) ? "https://
 function plugin_enqueue_scripts() {
     wp_register_style( "liac-main_style", LIAC_ROOT_URI."/style/css/main.css" );
     wp_enqueue_style( "liac-main_style" );
-    
-    var_dump(wp_style_is( "liac-main_style", "enqueued" ));
 }
 add_action( "wp_enqueue_scripts", "plugin_enqueue_scripts" );
