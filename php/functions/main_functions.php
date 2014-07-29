@@ -154,7 +154,7 @@ function liac_before_headers() {
 
     // Create an object
     $linkedin_api = liac_get_api_controller();
-
+    
     // Check if user authorized LinkedIn. Then redirect to the page where he came from
     if ( isset( $_SESSION['redirect_to'] ) && isset( $_GET['code'] ) && isset( $_SESSION['state'] ) && isset( $_GET['state'] ) ) {
 
@@ -165,9 +165,9 @@ function liac_before_headers() {
 
 	    $resource = '/v1/people/~:(id)';
 	    $result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
-
+	    
 	    set_transient( $result->id, $access_token->access_token, time() + $access_token->expires_in - ( 60 * 60 * 24 * 10 ) );
-	    setcookie( "linkedin_access_token", $result->access_token, time() + $access_token->expires_in - ( 60 * 60 * 24 * 10 ), "/", $_SERVER['HTTP_HOST'] );
+	    setcookie( "linkedin_access_token", $result->id, time() + $access_token->expires_in - ( 60 * 60 * 24 * 10 ), "/", $_SERVER['HTTP_HOST'] );
 
 	    unset( $_SESSION['state'] );
 	    unset( $_GET['state'] );
@@ -185,7 +185,7 @@ function liac_before_headers() {
 	} else if ( !empty( $_GET ) ) {
 	    $url .= "?" . http_build_query( $_GET );
 	}
-
+	
 	unset( $_SESSION['redirect_to'] );
 	header( "Location: $url" );
 	exit;
@@ -223,7 +223,7 @@ function liac_before_headers() {
 	}
     } else {
 	if ( isset( $_GET['liac-show-pdf'] ) || isset( $_GET['liac-apply-via-mail'] ) ) {
-	    // Not authorized so redirect to authorize again before watching pdf
+	    // Not authorized so redirect to authorize again before watching pdf or send email
 	    $linkedin_api->getAuthorizationCode( true );
 	}
     }

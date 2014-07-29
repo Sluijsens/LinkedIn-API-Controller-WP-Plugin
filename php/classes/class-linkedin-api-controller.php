@@ -23,10 +23,11 @@ class LinkedIN_API_Controller {
 		$this->_api_secret = $settings['api_secret'];
 		$this->_redirect_uri = $settings['redirect_uri'];
 		$this->_scope = $settings['scope'];
-
+		
 		if ( $this->checkAccessTokenCookie() ) {
 			$this->_is_authorized = true;
-			$this->_access_token = get_transient( $this->retrieveAccessToken() );
+			$this->_access_token = get_transient( $this->getUserIdFromCookie() );
+			
 		}
 
 	}
@@ -84,12 +85,12 @@ class LinkedIN_API_Controller {
 	 */
 	public function retrieveAccessToken( $set_cookie = TRUE ) {
 
-		if ( ! empty( $_COOKIE['linkedin_access_token'] ) ) {
-
-			$this->_access_token = $_COOKIE['linkedin_access_token'];
-			
-			return $this->_access_token;
-		} else if ( isset( $_GET['code'] ) ) {
+//		if ( ! empty( $_COOKIE['linkedin_access_token'] ) ) {
+//
+//			$this->_access_token = $_COOKIE['linkedin_access_token'];
+//			
+//			return $this->_access_token;
+		/*} else*/ if ( isset( $_GET['code'] ) ) {
 			// Set status of authorized to true
 			$this->_is_authorized = true;
 
@@ -223,5 +224,9 @@ class LinkedIN_API_Controller {
 	
 	public function setAccessToken( $access_token ) {
 		$this->_access_token = $access_token;
+	}
+	
+	public function getUserIdFromCookie() {
+		return $_COOKIE["linkedin_access_token"];
 	}
 }
