@@ -64,7 +64,7 @@ class LIAC_Data {
 		if( ! empty( $api_data->location->country->code ) && "" != $api_data->location->country->code )
 			$this->location_country_code = $api_data->location->country->code;
 		if( ! empty( $api_data->dateOfBirth ) )
-			$this->date_of_birth = mktime ( 0, 0, 0, $api_data->dateOfBirth->month, $api_data->dateOfBirth, $api_data->dateOfBirth->year );
+			$this->date_of_birth = mktime ( 0, 0, 0, $api_data->dateOfBirth->month, $api_data->dateOfBirth->day, $api_data->dateOfBirth->year );
 		if( ! empty( $api_data->industry ) && "" != $api_data->industry )
 			$this->industry = $api_data->industry;
 		if( ! empty( $api_data->headline ) && "" != $api_data->headline )
