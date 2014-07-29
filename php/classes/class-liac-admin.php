@@ -16,7 +16,7 @@ class LIAC_Admin {
 
 		$https = ( isset( $_SERVER['HTTPS'] ) && "on" == $_SERVER['HTTPS'] ) ? "https://" : "http://";
 		
-		$api_email = ( false != get_option( "liac-api_email", false ) ) ? get_option( "liac-api_key" ) : "";
+		$api_email = ( false != get_option( "liac-api_email", false ) ) ? get_option( "liac-api_email" ) : "";
 		$api_key = ( false != get_option( "liac-api_key", false ) ) ? get_option( "liac-api_key" ) : "";
 		$api_secret = ( false != get_option( "liac-api_secret", false ) ) ? get_option( "liac-api_secret" ) : "";
 		$api_scope = ( false != get_option( "liac-api_scope", false ) ) ? get_option( "liac-api_scope" ) : "";
