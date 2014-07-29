@@ -269,8 +269,8 @@ function writePDF( $linkedin_data, $return = false, $name = null ) {
     $pdf->SetFont( 'Times', 'B', 17 );
     $pdf->SetTextColor( 150, 150, 150 );
     $pdf->Cell( null, 10, "Experience", 0, 1 );
-
-    foreach ( $linkedin_data->positions as $position ) {
+    
+    foreach ( $linkedin_data->all_positions as $position ) {
 
 	$title = $position->title . ' at ' . $position->company->name;
 	$start_date = date( "F Y", mktime( 0, 0, 0, $position->startDate->month, 0, $position->startDate->year ) );
@@ -342,7 +342,7 @@ function writePDF( $linkedin_data, $return = false, $name = null ) {
     $list['text'] = array();
 
     $i = 0;
-    foreach ( $linkedin_data->skills->values as $skill ) {
+    foreach ( $linkedin_data->skills as $skill ) {
 	$list['text'][$i] = $skill->skill->name;
 	$i ++;
     }
