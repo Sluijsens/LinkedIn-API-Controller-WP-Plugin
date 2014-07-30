@@ -20,7 +20,7 @@ class LIAC_Admin {
 		$api_key = ( false != get_option( "liac-api_key", false ) ) ? get_option( "liac-api_key" ) : "";
 		$api_secret = ( false != get_option( "liac-api_secret", false ) ) ? get_option( "liac-api_secret" ) : "";
 		$api_scope = ( false != get_option( "liac-api_scope", false ) ) ? get_option( "liac-api_scope" ) : "";
-		$api_redirect = ( false != get_option( "liac-api_redirect", false ) ) ? get_option( "liac-api_redirect" ) : "$https$_SERVER[HTTP_HOST]";
+		$api_redirect = ( false != get_option( "liac-api_redirect", false ) ) ? get_option( "liac-api_redirect" ) : home_url();
 		$api_languages = ( false != get_option( "liac-api_languages", false ) ) ? get_option( "liac-api_languages" ) : "";
 
 		if ( isset( $_POST['api_key'] ) ) {

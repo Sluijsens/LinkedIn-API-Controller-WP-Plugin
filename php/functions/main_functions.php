@@ -16,9 +16,9 @@ function liac_get_default_data() {
  * Get the email template for the application email
  * @return string
  */
-function liac_get_email_template() {
+function liac_get_email_template( $type = "organization" ) {
 
-    $filename = "liac-email-template.php";
+    $filename = "liac-email-template-$type.php";
 
     if ( file_exists( TEMPLATEPATH . "/$filename" ) ) {
 	$filename = TEMPLATEPATH . "/$filename";
@@ -64,7 +64,7 @@ function liac_authorize( $atts ) {
     $linkedin_api = liac_get_api_controller();
     if ( !$linkedin_api->hasAccessToken() ) {
 	?>
-<a class="liac-apply_linkedin_button" href='<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'><img height="33px" width="190px" src="<?php echo LIAC_ROOT_URI.'/style/images/ApplyLinkedIn.png'; ?>" /></a>
+	<a class="liac-apply_linkedin_button" href='<?php echo $linkedin_api->getAuthorizationCode( $atts['redirect'] ); ?>'></a>
 	<?php
     } else {
 
@@ -87,7 +87,7 @@ add_shortcode( 'liac-linkedin_authorization', 'liac_authorize' );
  * Sends an email with a resume.
  * @param object $linkedin_data An PHP Object with the linkedin data
  */
-function send_resume_mail( $linkedin_data, $vacancy_id ) {
+function liac_send_resume_mail( $linkedin_data, $vacancy_id ) {
     
     global $wpdb;
     
@@ -96,11 +96,16 @@ function send_resume_mail( $linkedin_data, $vacancy_id ) {
     // email stuff (change data below)
     $to = get_option( 'liac-api_email' );
     $from = $linkedin_data->email;
-    $subject = __( "{$linkedin_data->firstName} {$linkedin_data->lastName} applied to {$vacancy->post_title}", "liac" );
+    $subject = __( "{$linkedin_data->first_name} {$linkedin_data->last_name} applied to {$vacancy->post_title}", "liac" );
 
     ob_start();
     include_once( liac_get_email_template() );
-    $message = ob_get_contents();
+    $message_organization = ob_get_contents();
+    ob_end_clean();
+    
+    ob_start();
+    include_once( liac_get_email_template( "applicant" ) );
+    $message_applicant = ob_get_contents();
     ob_end_clean();
 
     // a random hash will be necessary to send mixed content
@@ -111,36 +116,60 @@ function send_resume_mail( $linkedin_data, $vacancy_id ) {
 
     $filename = "{$linkedin_data->first_name}_{$linkedin_data->last_name}_CV.pdf";
     // encode data (puts attachment in proper format)
-    $pdfdoc = writePDF( $linkedin_data, true );
+    $pdfdoc = liac_writePDF( $linkedin_data, true );
     $attachment = chunk_split( base64_encode( $pdfdoc ) );
 
-    // main header
-    $headers = "From: " . $from . $eol;
-    $headers .= "MIME-Version: 1.0" . $eol;
-    $headers .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"";
-
+    // Organization headers
+    $headers_organization = "From: " . $from . $eol;
+    $headers_organization .= "MIME-Version: 1.0" . $eol;
+    $headers_organization .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"";
+    
+    // Applicant Headers
+    $headers_applicant = "From: " . $to . $eol;
+    $headers_applicant .= "MIME-Version: 1.0" . $eol;
+    $headers_applicant .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"";
+    
     // no more headers after this, we start the body! //
 
-    $body = "--" . $separator . $eol;
-    $body .= "Content-Transfer-Encoding: 7bit" . $eol . $eol;
-    $body .= "This is a MIME encoded message." . $eol;
-
+//    $body = "--" . $separator . $eol;
+//    $body .= "Content-Transfer-Encoding: 7bit" . $eol . $eol;
+//    $body .= "This is a MIME encoded message." . $eol;
+    
+    // Create Organization email
     // message
-    $body .= "--" . $separator . $eol;
-    $body .= "Content-Type: text/html; charset=\"iso-8859-1\"" . $eol;
-    $body .= "Content-Transfer-Encoding: 8bit" . $eol . $eol;
-    $body .= $message . $eol;
+    $body_organization .= "--" . $separator . $eol;
+    $body_organization .= "Content-Type: text/html; charset=\"iso-8859-1\"" . $eol;
+    $body_organization .= "Content-Transfer-Encoding: 8bit" . $eol . $eol;
+    $body_organization .= $message_organization . $eol;
 
     // attachment
-    $body .= "--" . $separator . $eol;
-    $body .= "Content-Type: application/octet-stream; name=\"" . $filename . "\"" . $eol;
-    $body .= "Content-Transfer-Encoding: base64" . $eol;
-    $body .= "Content-Disposition: attachment" . $eol . $eol;
-    $body .= $attachment . $eol;
-    $body .= "--" . $separator . "--";
+    $body_organization .= "--" . $separator . $eol;
+    $body_organization .= "Content-Type: application/octet-stream; name=\"" . $filename . "\"" . $eol;
+    $body_organization .= "Content-Transfer-Encoding: base64" . $eol;
+    $body_organization .= "Content-Disposition: attachment" . $eol . $eol;
+    $body_organization .= $attachment . $eol;
+    $body_organization .= "--" . $separator . "--";
+    // End create organization email
+    
+    // Create Applicant email
+    // message
+    $body_applicant .= "--" . $separator . $eol;
+    $body_applicant .= "Content-Type: text/html; charset=\"iso-8859-1\"" . $eol;
+    $body_applicant .= "Content-Transfer-Encoding: 8bit" . $eol . $eol;
+    $body_applicant .= $message_applicant . $eol;
 
+    // attachment
+    $body_applicant .= "--" . $separator . $eol;
+    $body_applicant .= "Content-Type: application/octet-stream; name=\"" . $filename . "\"" . $eol;
+    $body_applicant .= "Content-Transfer-Encoding: base64" . $eol;
+    $body_applicant .= "Content-Disposition: attachment" . $eol . $eol;
+    $body_applicant .= $attachment . $eol;
+    $body_applicant .= "--" . $separator . "--";
+    // End create Applicant email
+    
     // send message
-    mail( $to, $subject, $body, $headers );
+    mail( $from, $subject, $body_applicant, $headers_applicant );
+    mail( $to, $subject, $body_organization, $headers_organization );
 }
 
 /**
@@ -191,19 +220,21 @@ function liac_before_headers() {
 	exit;
     }
 
-    if ( $linkedin_api->hasAccessToken() ) {
+
+if ( ( $linkedin_api->hasAccessToken() ) && ( isset( $_GET['liac-show-pdf'] ) || isset( $_GET['liac-apply-via-mail'] ) ) ) {
+    
 	$resource = '/v1/people/~:(id,email-address,first-name,last-name,picture-url,phone-numbers,main-address,headline,date-of-birth,location:(name,country:(code)),industry,summary,specialties,positions,educations,public-profile-url,interests,publications,languages,skills,certifications,courses,volunteer,honors-awards,last-modified-timestamp,recommendations-received)';
 	$result = $linkedin_api->fetch( $resource, 'GET', get_option( 'liac-api_languages', 'en-US' ) );
 
 	if ( isset( $_GET['liac-show-pdf'] ) ) {
 
-	    writePDF( $result );
+	    liac_writePDF( $result );
 	    exit;
 	} else if ( $linkedin_api->hasAccessToken() && isset( $_GET['liac-apply-via-mail'] ) ) {
-
+	    
 	    if( isset( $_GET['vacancy_id'] ) && is_numeric( $_GET['vacancy_id'] ) ) {
-		send_resume_mail( $result, $_GET['vacancy_id'] );
-
+		liac_send_resume_mail( $result, $_GET['vacancy_id'] );
+		
 		ob_start();
 		?>
 		
@@ -214,7 +245,7 @@ function liac_before_headers() {
 		$email_notification = ob_get_contents();
 		ob_end_clean();
 		
-		$email_notification = apply_filters( "liac-email_apply_success_notification", $email_notification );
+		$email_notification = apply_filters( "liac-email_apply_success_notification", $email_notification, $_GET['vacancy_id'] );
 		
 		echo $email_notification;
 	    } else {
@@ -222,6 +253,7 @@ function liac_before_headers() {
 	    }
 	}
     } else {
+	
 	if ( isset( $_GET['liac-show-pdf'] ) || isset( $_GET['liac-apply-via-mail'] ) ) {
 	    // Not authorized so redirect to authorize again before watching pdf or send email
 	    $linkedin_api->getAuthorizationCode( true );
@@ -231,7 +263,8 @@ function liac_before_headers() {
 
 add_action( 'init', 'liac_before_headers' );
 
-function writePDF( $linkedin_data, $return = false, $name = null ) {
+function liac_writePDF( $linkedin_data, $return = false, $name = null ) {
+    $linkedin_data instanceof LIAC_Data;
     $pdf = new FPDF_HTML();
 
     $pdf->AddPage();
@@ -241,11 +274,15 @@ function writePDF( $linkedin_data, $return = false, $name = null ) {
     $pdf->Cell( null, 10, "{$linkedin_data->first_name} {$linkedin_data->last_name}", 0, 1 );
     $pdf->SetFont( 'Arial', null, 11 );
     $pdf->Cell( null, 10, $linkedin_data->headline, 0, 1 );
-    $pdf->Write( 5, "{$linkedin_data->email}, " );
+    $pdf->Write( 5, __( "Phone number", "liac" ) . ": {$linkedin_data->phone_number}" );
+    $pdf->Ln();
+    $pdf->Write( 5, __( "E-mail address", "liac" ) . ": {$linkedin_data->email}" );
+    $pdf->Ln();
+    $pdf->Write( 5, __( "LinkedIn URL", "liac" ) . ": ");
     $pdf->SetTextColor( 0, 0, 255 );
     $pdf->SetFont( 'Arial', 'U' );
     $pdf->Write( 5, $linkedin_data->public_profile_url, $linkedin_data->public_profile_url );
-
+    
     $pdf->WriteHTML( "<br /><br /><hr><br />" );
     // End Block
 

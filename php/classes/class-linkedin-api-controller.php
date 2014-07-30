@@ -170,10 +170,15 @@ class LinkedIN_API_Controller {
 			);
 
 			// Hocus Pocus
-			$response = file_get_contents( $url, false, $context );
-
-			// Native PHP object, please
-			return new LIAC_Data( json_decode( $response ) );
+			$response = @file_get_contents( $url, false, $context );
+			
+			if( FALSE !== $response ) {
+			    // Native PHP object, please
+			    return new LIAC_Data( json_decode( $response ) );
+			} else {
+			    // Failed to get data, might be revoked authorization so authorize (again)
+			    $this->getAuthorizationCode( TRUE, FALSE );
+			}
 		} else {
                         $this->getAuthorizationCode( TRUE, FALSE );
 		}
