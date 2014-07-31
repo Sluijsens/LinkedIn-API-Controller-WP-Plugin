@@ -263,6 +263,13 @@ if ( ( $linkedin_api->hasAccessToken() ) && ( isset( $_GET['liac-show-pdf'] ) ||
 
 add_action( 'init', 'liac_before_headers' );
 
+/**
+ * Write a PDF resume to preview or send as an attachment.
+ * @param LIAC_Data $linkedin_data The result Data retrieved from linkedin.
+ * @param Boolean $return Returns the PDF file if this is set to TRUE, else it outputs it as a preview.
+ * @param String $name Define the name of the document
+ * @return PDF If there is no preview output it returns a the PDF file.
+ */
 function liac_writePDF( $linkedin_data, $return = false, $name = null ) {
     $linkedin_data instanceof LIAC_Data;
     $pdf = new FPDF_HTML();

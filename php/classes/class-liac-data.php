@@ -6,39 +6,39 @@ class LIAC_Data {
 	public $id;
 	
 	// Personal Info
-	public $picture_url = "";
-	public $first_name = "";
-	public $last_name = "";
-	public $phone_number = "";
-	public $email = "";
-	public $public_profile_url = "";
-	public $address = "";
-	public $location_name = "";
-	public $location_country_code = "";
-	public $date_of_birth = "";
-	public $industry = "";
+	public $picture_url;
+	public $first_name;
+	public $last_name;
+	public $phone_number;
+	public $email;
+	public $public_profile_url;
+	public $address;
+	public $location_name;
+	public $location_country_code;
+	public $date_of_birth;
+	public $industry;
 	
 	// Experiences and skills (rest of the info)
-	public $headline = "";
-	public $summary = "";
-	public $specialties = "";
-	public $current_positions = "";
-	public $past_positions = "";
-	public $all_positions = "";
-	public $educations = "";
-	public $recommendations = "";
-	public $languages = "";
-	public $skills = "";
-	public $certifications = "";
-	public $courses = "";
-	public $interests = "";
-	public $volunteer = "";
-	public $honors_and_rewards = "";
-	public $publications = "";
-	public $last_modified = "";
+	public $headline;
+	public $summary;
+	public $specialties;
+	public $current_positions;
+	public $past_positions;
+	public $all_positions;
+	public $educations;
+	public $recommendations;
+	public $languages;
+	public $skills;
+	public $certifications;
+	public $courses;
+	public $interests;
+	public $volunteer;
+	public $honors_and_rewards;
+	public $publications;
+	public $last_modified;
 	
 	// Allow user to get the original/raw data
-	public $original_data = "";
+	public $original_data;
 	
 	public function __construct( $api_data ) {
 		
