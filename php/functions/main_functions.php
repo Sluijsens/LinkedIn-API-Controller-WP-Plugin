@@ -261,7 +261,7 @@ if ( ( $linkedin_api->hasAccessToken() ) && ( isset( $_GET['liac-show-pdf'] ) ||
     }
 }
 
-add_action( 'init', 'liac_before_headers' );
+add_action( 'init', 'liac_before_headers', 1 );
 
 /**
  * Write a PDF resume to preview or send as an attachment.
@@ -271,27 +271,52 @@ add_action( 'init', 'liac_before_headers' );
  * @return PDF If there is no preview output it returns a the PDF file.
  */
 function liac_writePDF( $linkedin_data, $return = false, $name = null ) {
+    // Define $linkedin_data as a LIAC_Data Object
     $linkedin_data instanceof LIAC_Data;
+    
+    // Create the pdf file and the starting page
     $pdf = new FPDF_HTML();
-
     $pdf->AddPage();
 
-    // Start PDF page Block with Name, headline, email and linked in profile link
-    $pdf->SetFont( 'Times', 'B', 22 );
-    $pdf->Cell( null, 10, "{$linkedin_data->first_name} {$linkedin_data->last_name}", 0, 1 );
-    $pdf->SetFont( 'Arial', null, 11 );
-    $pdf->Cell( null, 10, $linkedin_data->headline, 0, 1 );
-    $pdf->Write( 5, __( "Phone number", "liac" ) . ": {$linkedin_data->phone_number}" );
-    $pdf->Ln();
-    $pdf->Write( 5, __( "E-mail address", "liac" ) . ": {$linkedin_data->email}" );
-    $pdf->Ln();
-    $pdf->Write( 5, __( "LinkedIn URL", "liac" ) . ": ");
-    $pdf->SetTextColor( 0, 0, 255 );
-    $pdf->SetFont( 'Arial', 'U' );
-    $pdf->Write( 5, $linkedin_data->public_profile_url, $linkedin_data->public_profile_url );
+    // Start PDF; Personal Info Block with Name, Headline, Phone numer, E-mail and LinkedIn profile url
+    $pdf->Image( $linkedin_data->picture_url, 10, 10, null, null, "JPG" ); // Draw Image to PDF
+    $pdf->Cell(25, 12);
+    $pdf->SetFont( 'Times', 'B', 22 ); // Set font
+    $pdf->Cell( null, 12, "{$linkedin_data->first_name} {$linkedin_data->last_name}", 0, 1 ); // Create a cell with the name
+    $pdf->Cell(25, 5);
+    $pdf->SetFont( 'Arial', null, 11 ); // Set font
+    $pdf->Cell( null, 5, $linkedin_data->headline, 0, 1 ); // Create a cell with the headline
+    $pdf->Ln(5);
+    $pdf->Cell(25, 5);
+    // NEW STYLE
+    $pdf->Write( 5, "{$linkedin_data->phone_number} - {$linkedin_data->email} - " ); // Write phone number
+    $pdf->SetTextColor( 0, 0, 255 ); // Set link text color
+    $pdf->SetFont( 'Arial', 'U' ); // Set style to underlined
+    $pdf->Write( 5, $linkedin_data->public_profile_url, $linkedin_data->public_profile_url ); // Write the LinkedIn profile url creating a actual link with the last parameter.
+    // END NEW STYLE
+    $pdf->Ln();// New line
+    $pdf->Cell(25, 5);
     
-    $pdf->WriteHTML( "<br /><br /><hr><br />" );
-    // End Block
+    $pdf->SetFont( 'Arial', null, 11 );
+    $pdf->SetTextColor( 0, 0, 0 );
+    $pdf->Cell( null, 5, "{$linkedin_data->address} - {$linkedin_data->location_name} ({$linkedin_data->location_country_code})", 0, 1 );
+    $pdf->Cell(25, 5);
+    $pdf->Cell( null, 5, date( __( "d-m-Y", "liac" ), $linkedin_data->date_of_birth ), 0, 1 );
+    
+    /* OLD STYLE
+    $pdf->Write( 5, __( "Phone number", "liac" ) . ": {$linkedin_data->phone_number}" ); // Write phone number
+    $pdf->Ln();// New line
+    $pdf->Cell(25, 5);
+    $pdf->Write( 5, __( "E-mail address", "liac" ) . ": {$linkedin_data->email}" ); // Write E-maill address
+    $pdf->Ln(); // New line
+    $pdf->Cell(25, 5);
+    $pdf->Write( 5, __( "LinkedIn URL", "liac" ) . ": ");  // LinkedIn profile url tag
+    $pdf->SetTextColor( 0, 0, 255 ); // Set link text color
+    $pdf->SetFont( 'Arial', 'U' ); // Set style to underlined
+    $pdf->Write( 5, $linkedin_data->public_profile_url, $linkedin_data->public_profile_url ); // Write the LinkedIn profile url creating a actual link with the last parameter.
+    */
+    $pdf->WriteHTML( "<br /><hr><br />" ); // A horizontal line to divide the blocks
+    // End Personal Info Block
 
     /* Start Block Summary */
     $pdf->SetFont( 'Times', 'B', 17 );
@@ -305,7 +330,7 @@ function liac_writePDF( $linkedin_data, $return = false, $name = null ) {
     } else {
 	$pdf->WriteHTML( "<br />Geen samenvatting" );
     }
-    $pdf->Image( $linkedin_data->picture_url, 165, 10, null, null, "JPG" );
+    
     $pdf->WriteHTML( "<br /><br /><hr><br />" );
     /* End Block Summary */
 
